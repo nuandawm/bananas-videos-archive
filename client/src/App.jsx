@@ -1,12 +1,29 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, NavLink } from 'react-router-dom';
-import { Video, Tags, Library } from 'lucide-react';
+import { Video, Tags, Library, RefreshCw } from 'lucide-react';
 import Dashboard from './components/Dashboard';
 import Tagger from './components/Tagger';
 
 function App() {
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [syncing, setSyncing] = useState(false);
+
+  const handleSync = async () => {
+    try {
+      setSyncing(true);
+      const response = await fetch('http://localhost:3001/api/sync');
+      if (response.ok) {
+        await fetchVideos();
+      } else {
+        console.error('Sync failed to return OK state');
+      }
+    } catch (error) {
+      console.error('Error during sync:', error);
+    } finally {
+      setSyncing(false);
+    }
+  };
 
   // Fetch videos from our backend
   const fetchVideos = async () => {
@@ -55,6 +72,15 @@ function App() {
             <NavLink to="/tagger" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
               <Tags className="inline-block w-4 h-4 mr-2" /> Tag Videos
             </NavLink>
+            <button 
+              onClick={handleSync} 
+              disabled={syncing || loading}
+              className="btn-secondary" 
+              style={{ marginLeft: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.4rem 0.8rem', fontSize: '0.9rem' }}
+            >
+              <RefreshCw size={16} />
+              {syncing ? 'Syncing...' : 'Sync Drive'}
+            </button>
           </nav>
         </header>
 
