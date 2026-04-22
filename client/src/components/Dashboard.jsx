@@ -6,6 +6,7 @@ import { Filter, List } from 'lucide-react';
 const Dashboard = ({ videos }) => {
   const [groupBy, setGroupBy] = useState('song_name'); // 'song_name' or 'venue'
   const [filterType, setFilterType] = useState('all'); // 'all', 'acoustic', 'electric'
+  const [showPartial, setShowPartial] = useState(true);
   const [activeVideo, setActiveVideo] = useState(null);
 
   const filteredVideos = useMemo(() => {
@@ -15,8 +16,13 @@ const Dashboard = ({ videos }) => {
     if (filterType !== 'all') {
       vids = vids.filter(v => v.type === filterType);
     }
+
+    if (!showPartial) {
+      vids = vids.filter(v => !v.partial);
+    }
+
     return vids;
-  }, [videos, filterType]);
+  }, [videos, filterType, showPartial]);
 
   const groupedVideos = useMemo(() => {
     const groups = {};
@@ -58,6 +64,17 @@ const Dashboard = ({ videos }) => {
             <option value="acoustic">Acoustic</option>
             <option value="electric">Electric</option>
           </select>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginLeft: '1rem' }}>
+          <input 
+            type="checkbox" 
+            id="show-partial" 
+            checked={showPartial} 
+            onChange={(e) => setShowPartial(e.target.checked)} 
+            style={{ width: 'auto' }}
+          />
+          <label htmlFor="show-partial" style={{ cursor: 'pointer', whiteSpace: 'nowrap' }}>Show Partial</label>
         </div>
       </div>
 

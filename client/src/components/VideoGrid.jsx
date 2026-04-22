@@ -40,6 +40,11 @@ const VideoGrid = ({ videos, onPlay }) => {
                   {video.venue}
                 </span>
               )}
+              {!!video.partial && (
+                <span className="badge" style={{ backgroundColor: 'var(--warning)', color: '#000' }}>
+                  Partial
+                </span>
+              )}
             </div>
             {!video.song_name && (
               <div style={{ fontSize: '0.8rem', color: 'var(--warning)', marginTop: '0.5rem' }}>

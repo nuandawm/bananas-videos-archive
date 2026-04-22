@@ -5,7 +5,7 @@ import { PlayCircle, Save } from 'lucide-react';
 const Tagger = ({ videos, onUpdateTags }) => {
   const [activeVideo, setActiveVideo] = useState(null);
   const [editingId, setEditingId] = useState(null);
-  const [formState, setFormState] = useState({ song_name: '', venue: '', type: 'electric' });
+  const [formState, setFormState] = useState({ song_name: '', venue: '', type: 'electric', partial: false });
 
   // Untagged videos first, then tagged
   const sortedVideos = useMemo(() => {
@@ -31,7 +31,8 @@ const Tagger = ({ videos, onUpdateTags }) => {
     setFormState({
       song_name: video.song_name || '',
       venue: video.venue || '',
-      type: video.type || 'electric'
+      type: video.type || 'electric',
+      partial: !!video.partial
     });
   };
 
@@ -110,6 +111,16 @@ const Tagger = ({ videos, onUpdateTags }) => {
                          <option value="electric">Electric</option>
                       </select>
                     </div>
+                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginTop: '0.25rem' }}>
+                      <input 
+                        type="checkbox" 
+                        id="partial-check"
+                        checked={formState.partial}
+                        onChange={e => setFormState({...formState, partial: e.target.checked})}
+                        style={{ width: 'auto' }}
+                      />
+                      <label htmlFor="partial-check" style={{ fontSize: '0.9rem', color: 'var(--text-main)', cursor: 'pointer' }}>Mark as partial/incomplete</label>
+                    </div>
                     <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
                        <button className="btn-secondary" onClick={() => setEditingId(null)} style={{ padding: '0.5rem 1rem' }}>Cancel</button>
                        <button className="btn-primary" onClick={() => handleSave(video)} style={{ padding: '0.5rem 1rem' }}><Save size={16}/> Save</button>
@@ -121,12 +132,13 @@ const Tagger = ({ videos, onUpdateTags }) => {
                       <h4 style={{ fontSize: '1.1rem', marginBottom: '0.25rem' }}>
                         {video.song_name || <span style={{ color: 'var(--warning)', fontStyle: 'italic', fontWeight: 400 }}>Untagged</span>}
                       </h4>
-                      {(video.venue || video.type) && (
+                      {(video.venue || video.type || video.partial) ? (
                         <div style={{ display: 'flex', gap: '0.5rem' }}>
                           {video.type && <span className={`badge ${video.type}`}>{video.type}</span>}
                           {video.venue && <span className="badge" style={{ backgroundColor: 'rgba(255,255,255,0.1)', color: '#ccc', borderColor: 'rgba(255,255,255,0.2)' }}>{video.venue}</span>}
+                          {!!video.partial && <span className="badge" style={{ backgroundColor: 'var(--warning)', color: '#000' }}>Partial</span>}
                         </div>
-                      )}
+                      ) : null}
                     </div>
                     <button className="btn-secondary" onClick={() => handleEditClick(video)}>
                       Edit Tags

@@ -12,9 +12,14 @@ db.serialize(() => {
       name TEXT NOT NULL,
       song_name TEXT,
       venue TEXT,
-      type TEXT
+      type TEXT,
+      partial INTEGER DEFAULT 0
     )
   `);
+  
+  db.run(`ALTER TABLE videos ADD COLUMN partial INTEGER DEFAULT 0`, (err) => {
+    // Ignore error if column already exists
+  });
 });
 
 module.exports = db;

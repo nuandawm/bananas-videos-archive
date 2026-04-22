@@ -78,11 +78,11 @@ app.get('/api/videos', (req, res) => {
 // Update video tags
 app.put('/api/videos/:id', (req, res) => {
     const { id } = req.params;
-    const { song_name, venue, type } = req.body;
+    const { song_name, venue, type, partial } = req.body;
 
     db.run(
-        'UPDATE videos SET song_name = ?, venue = ?, type = ? WHERE id = ?',
-        [song_name, venue, type, id],
+        'UPDATE videos SET song_name = ?, venue = ?, type = ?, partial = ? WHERE id = ?',
+        [song_name, venue, type, partial ? 1 : 0, id],
         function(err) {
             if (err) return res.status(500).json({ error: err.message });
             res.json({ message: 'Updated', changes: this.changes });
@@ -97,16 +97,16 @@ app.post('/api/mock-data', (req, res) => {
         
         if (row.count === 0) {
             const mockVideos = [
-                { drive_file_id: 'mock1', name: 'rehearsal_01.mp4', song_name: 'Smells Like Teen Spirit', venue: 'Rehearsals', type: 'electric' },
-                { drive_file_id: 'mock2', name: 'gig_track2.mp4', song_name: 'Smells Like Teen Spirit', venue: 'Billy Bootleggers gig', type: 'electric' },
-                { drive_file_id: 'mock3', name: 'acoustic_jam.mp4', song_name: 'Wonderwall', venue: 'Rehearsals', type: 'acoustic' },
-                { drive_file_id: 'mock4', name: 'nav_gig_01.mp4', song_name: 'Wonderwall', venue: 'Navigation gig', type: 'electric' },
-                { drive_file_id: 'mock5', name: 'unknown_clip.mp4', song_name: null, venue: null, type: null },
+                { drive_file_id: 'mock1', name: 'rehearsal_01.mp4', song_name: 'Smells Like Teen Spirit', venue: 'Rehearsals', type: 'electric', partial: 0 },
+                { drive_file_id: 'mock2', name: 'gig_track2.mp4', song_name: 'Smells Like Teen Spirit', venue: 'Billy Bootleggers gig', type: 'electric', partial: 0 },
+                { drive_file_id: 'mock3', name: 'acoustic_jam.mp4', song_name: 'Wonderwall', venue: 'Rehearsals', type: 'acoustic', partial: 1 },
+                { drive_file_id: 'mock4', name: 'nav_gig_01.mp4', song_name: 'Wonderwall', venue: 'Navigation gig', type: 'electric', partial: 0 },
+                { drive_file_id: 'mock5', name: 'unknown_clip.mp4', song_name: null, venue: null, type: null, partial: 0 },
             ];
 
-            const insertStmt = db.prepare('INSERT INTO videos (drive_file_id, name, song_name, venue, type) VALUES (?, ?, ?, ?, ?)');
+            const insertStmt = db.prepare('INSERT INTO videos (drive_file_id, name, song_name, venue, type, partial) VALUES (?, ?, ?, ?, ?, ?)');
             for (const v of mockVideos) {
-                insertStmt.run(v.drive_file_id, v.name, v.song_name, v.venue, v.type);
+                insertStmt.run(v.drive_file_id, v.name, v.song_name, v.venue, v.type, v.partial);
             }
             insertStmt.finalize();
             res.json({ message: 'Mock data created' });
