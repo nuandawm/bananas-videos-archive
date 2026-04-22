@@ -12,7 +12,7 @@ function App() {
   const handleSync = async () => {
     try {
       setSyncing(true);
-      const response = await fetch('http://localhost:3001/api/sync');
+      const response = await fetch('/api/sync');
       if (response.ok) {
         await fetchVideos();
       } else {
@@ -29,7 +29,7 @@ function App() {
   const fetchVideos = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:3001/api/videos');
+      const response = await fetch('/api/videos');
       if (response.ok) {
         const data = await response.json();
         setVideos(data);
@@ -47,7 +47,7 @@ function App() {
 
   const handleUpdateTags = async (id, tags) => {
     try {
-      const response = await fetch(`http://localhost:3001/api/videos/${id}`, {
+      const response = await fetch(`/api/videos/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(tags),

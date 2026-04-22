@@ -1,0 +1,17 @@
+{
+  "name": "bananas-videos-archive",
+  "version": "1.0.0",
+  "description": "Band Video Archive - Netlify and Turso Refactor",
+  "main": "netlify/functions/api.js",
+  "scripts": {
+    "build": "cd client && npm install && npm run build"
+  },
+  "dependencies": {
+    "@libsql/client": "^0.14.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "googleapis": "^171.4.0",
+    "serverless-http": "^3.2.0"
+  }
+}
