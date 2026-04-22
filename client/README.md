@@ -1,15 +1,14 @@
-# React + Vite
+# Band Video Archive - Client
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is the React frontend for the Band Video Archive project. 
 
-Currently, two official plugins are available:
+For the complete project overview, features, and full-stack setup instructions, please see the [main README](../README.md) in the root directory.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Development
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+To run the frontend locally:
+1. `npm install`
+2. `npm run dev`
 
 ## Expanding the ESLint configuration
 
