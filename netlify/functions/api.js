@@ -113,11 +113,18 @@ app.get('/api/videos', async (req, res) => {
 app.put('/api/videos/:id', async (req, res) => {
     const { id } = req.params;
     const { song_name, venue, type, partial } = req.body;
+    const args = [
+        song_name != null ? String(song_name) : null,
+        venue != null ? String(venue) : null,
+        type != null ? String(type) : null,
+        partial ? 1 : 0,
+        Number(id)
+    ];
 
     try {
         const result = await db.execute({
             sql: 'UPDATE videos SET song_name = ?, venue = ?, type = ?, partial = ? WHERE id = ?',
-            args: [song_name, venue, type, partial ? 1 : 0, id]
+            args: args
         });
         res.json({ message: 'Updated', changes: result.rowsAffected });
     } catch (error) {
