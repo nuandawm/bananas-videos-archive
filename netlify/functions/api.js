@@ -12,26 +12,26 @@ app.use(express.json());
 
 // Initialize Turso DB Client
 const db = createClient({
-  url: process.env.TURSO_DATABASE_URL || 'libsql://dummy',
-  authToken: process.env.TURSO_AUTH_TOKEN || 'dummy'
+    url: process.env.TURSO_DATABASE_URL || 'libsql://dummy',
+    authToken: process.env.TURSO_AUTH_TOKEN || 'dummy'
 });
 
-const FOLDER_ID = process.env.DRIVE_FOLDER_ID || 'dummy_folder_id'; 
+const FOLDER_ID = process.env.DRIVE_FOLDER_ID || 'dummy_folder_id';
 
 let driveService = null;
 try {
-  let authOptions = {
-    scopes: ['https://www.googleapis.com/auth/drive.readonly'],
-  };
+    let authOptions = {
+        scopes: ['https://www.googleapis.com/auth/drive.readonly'],
+    };
 
-  if (process.env.GOOGLE_CREDENTIALS) {
-    authOptions.credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS);
-    const auth = new google.auth.GoogleAuth(authOptions);
-    driveService = google.drive({ version: 'v3', auth });
-    console.log('Google Drive API initialized successfully.');
-  } else {
-    console.log('GOOGLE_CREDENTIALS environment variable not set. Drive API will not be initialized.');
-  }
+    if (process.env.GOOGLE_CREDENTIALS) {
+        authOptions.credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS);
+        const auth = new google.auth.GoogleAuth(authOptions);
+        driveService = google.drive({ version: 'v3', auth });
+        console.log('Google Drive API initialized successfully.');
+    } else {
+        console.log('GOOGLE_CREDENTIALS environment variable not set. Drive API will not be initialized.');
+    }
 } catch (error) {
     console.log('Google Drive API not initialized. Ensure GOOGLE_CREDENTIALS is valid JSON.', error.message);
 }
@@ -39,7 +39,7 @@ try {
 // Function to fetch files from Google Drive
 async function getDriveFiles() {
     if (!driveService) return [];
-    
+
     try {
         const response = await driveService.files.list({
             q: `'${FOLDER_ID}' in parents and mimeType contains 'video/' and trashed = false`,
@@ -55,12 +55,12 @@ async function getDriveFiles() {
 // Ensure Drive files exist in DB
 app.get('/api/sync', async (req, res) => {
     if (!driveService) {
-        return res.json({ message: 'Drive Service not configured. Skipped sync.'});
+        return res.json({ message: 'Drive Service not configured. Skipped sync.' });
     }
 
     try {
         const driveFiles = await getDriveFiles();
-        
+
         // Prepare batch statements to insert files if they don't exist
         const batchStatements = driveFiles.map(file => ({
             sql: 'INSERT OR IGNORE INTO videos (drive_file_id, name) VALUES (?, ?)',
@@ -84,6 +84,26 @@ app.get('/api/videos', async (req, res) => {
         const result = await db.execute('SELECT * FROM videos');
         res.json(result.rows);
     } catch (error) {
+        if (error.message && error.message.includes('no such table: videos')) {
+            try {
+                await db.execute(`
+                    CREATE TABLE IF NOT EXISTS videos (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        drive_file_id TEXT UNIQUE NOT NULL,
+                        name TEXT NOT NULL,
+                        song_name TEXT,
+                        venue TEXT,
+                        type TEXT,
+                        partial INTEGER DEFAULT 0
+                    )
+                `);
+                console.log('Created videos table successfully.');
+                return res.json([]);
+            } catch (createError) {
+                console.error('Error creating videos table:', createError);
+                return res.status(500).json({ error: createError.message });
+            }
+        }
         console.error('Fetch Videos Error:', error);
         res.status(500).json({ error: error.message });
     }
@@ -124,7 +144,7 @@ app.post('/api/mock-data', async (req, res) => {
 
         const result = await db.execute('SELECT COUNT(*) as count FROM videos');
         const count = result.rows[0].count;
-        
+
         if (count === 0) {
             const mockVideos = [
                 { drive_file_id: 'mock1', name: 'rehearsal_01.mp4', song_name: 'Smells Like Teen Spirit', venue: 'Rehearsals', type: 'electric', partial: 0 },
