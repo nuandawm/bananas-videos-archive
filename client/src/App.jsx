@@ -53,7 +53,10 @@ function App() {
         body: JSON.stringify(tags),
       });
       if (response.ok) {
-        setVideos(videos.map(v => v.id === id ? { ...v, ...tags } : v));
+        const data = await response.json();
+        if (data.video) {
+          setVideos(videos.map(v => v.id === id ? data.video : v));
+        }
       }
     } catch (error) {
       console.error('Error updating tags:', error);
