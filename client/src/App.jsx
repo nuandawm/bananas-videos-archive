@@ -1,8 +1,53 @@
 import { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, NavLink } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, NavLink, useLocation } from 'react-router-dom';
 import { Video, Tags, Library, RefreshCw } from 'lucide-react';
 import Dashboard from './components/Dashboard';
 import Tagger from './components/Tagger';
+import MobileView from './components/MobileView';
+
+function AppContent({ videos, loading, syncing, handleSync, handleUpdateTags }) {
+  const location = useLocation();
+  const isMobileView = location.pathname === '/mobile';
+
+  return (
+    <div className="container" style={isMobileView ? { padding: '1rem' } : undefined}>
+      {!isMobileView && (
+        <header>
+          <h1><Video className="inline-block mr-2" /> Band Archive</h1>
+          <nav>
+            <NavLink to="/" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+              <Library className="inline-block w-4 h-4 mr-2" /> Library
+            </NavLink>
+            <NavLink to="/tagger" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+              <Tags className="inline-block w-4 h-4 mr-2" /> Tag Videos
+            </NavLink>
+            <button 
+              onClick={handleSync} 
+              disabled={syncing || loading}
+              className="btn-secondary" 
+              style={{ marginLeft: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.4rem 0.8rem', fontSize: '0.9rem' }}
+            >
+              <RefreshCw size={16} />
+              {syncing ? 'Syncing...' : 'Sync Drive'}
+            </button>
+          </nav>
+        </header>
+      )}
+
+      <main>
+        {loading ? (
+          <div className="flex justify-center p-12">Loading...</div>
+        ) : (
+          <Routes>
+            <Route path="/" element={<Dashboard videos={videos} />} />
+            <Route path="/tagger" element={<Tagger videos={videos} onUpdateTags={handleUpdateTags} />} />
+            <Route path="/mobile" element={<MobileView videos={videos} />} />
+          </Routes>
+        )}
+      </main>
+    </div>
+  );
+}
 
 function App() {
   const [videos, setVideos] = useState([]);
@@ -65,41 +110,16 @@ function App() {
 
   return (
     <Router>
-      <div className="container">
-        <header>
-          <h1><Video className="inline-block mr-2" /> Band Archive</h1>
-          <nav>
-            <NavLink to="/" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-              <Library className="inline-block w-4 h-4 mr-2" /> Library
-            </NavLink>
-            <NavLink to="/tagger" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
-              <Tags className="inline-block w-4 h-4 mr-2" /> Tag Videos
-            </NavLink>
-            <button 
-              onClick={handleSync} 
-              disabled={syncing || loading}
-              className="btn-secondary" 
-              style={{ marginLeft: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.4rem 0.8rem', fontSize: '0.9rem' }}
-            >
-              <RefreshCw size={16} />
-              {syncing ? 'Syncing...' : 'Sync Drive'}
-            </button>
-          </nav>
-        </header>
-
-        <main>
-          {loading ? (
-            <div className="flex justify-center p-12">Loading...</div>
-          ) : (
-            <Routes>
-              <Route path="/" element={<Dashboard videos={videos} />} />
-              <Route path="/tagger" element={<Tagger videos={videos} onUpdateTags={handleUpdateTags} />} />
-            </Routes>
-          )}
-        </main>
-      </div>
+      <AppContent 
+        videos={videos} 
+        loading={loading} 
+        syncing={syncing} 
+        handleSync={handleSync} 
+        handleUpdateTags={handleUpdateTags} 
+      />
     </Router>
   );
 }
 
 export default App;
+
