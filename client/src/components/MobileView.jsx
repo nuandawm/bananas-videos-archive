@@ -5,7 +5,7 @@ import VideoPlayerModal from './VideoPlayerModal';
 const MobileView = ({ videos }) => {
   const [groupBy, setGroupBy] = useState('song_name'); // 'song_name' or 'venue'
   const [filterType, setFilterType] = useState('all'); // 'all', 'acoustic', 'electric'
-  const [showPartial, setShowPartial] = useState(true);
+  const [showPartial, setShowPartial] = useState(false);
   const [activeVideo, setActiveVideo] = useState(null);
 
   const filteredVideos = useMemo(() => {
@@ -48,8 +48,8 @@ const MobileView = ({ videos }) => {
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', width: '100%' }}>
           <List size={18} style={{ color: 'var(--text-muted)' }} />
           <strong style={{ whiteSpace: 'nowrap', fontSize: '0.9rem' }}>Group By:</strong>
-          <select 
-            value={groupBy} 
+          <select
+            value={groupBy}
             onChange={(e) => setGroupBy(e.target.value)}
             style={{ width: '100%', padding: '0.5rem' }}
           >
@@ -61,8 +61,8 @@ const MobileView = ({ videos }) => {
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', width: '100%' }}>
           <Filter size={18} style={{ color: 'var(--text-muted)' }} />
           <strong style={{ whiteSpace: 'nowrap', fontSize: '0.9rem' }}>Type:</strong>
-          <select 
-            value={filterType} 
+          <select
+            value={filterType}
             onChange={(e) => setFilterType(e.target.value)}
             style={{ width: '100%', padding: '0.5rem' }}
           >
@@ -73,11 +73,11 @@ const MobileView = ({ videos }) => {
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', width: '100%' }}>
-          <input 
-            type="checkbox" 
-            id="show-partial-mobile" 
-            checked={showPartial} 
-            onChange={(e) => setShowPartial(e.target.checked)} 
+          <input
+            type="checkbox"
+            id="show-partial-mobile"
+            checked={showPartial}
+            onChange={(e) => setShowPartial(e.target.checked)}
             style={{ width: 'auto', margin: 0 }}
           />
           <label htmlFor="show-partial-mobile" style={{ cursor: 'pointer', whiteSpace: 'nowrap', fontSize: '0.9rem' }}>
@@ -105,9 +105,9 @@ const MobileView = ({ videos }) => {
                 </div>
                 <div className="mobile-video-list">
                   {groupVideos.map(video => (
-                    <div 
-                      key={video.id} 
-                      className="mobile-video-item" 
+                    <div
+                      key={video.id}
+                      className="mobile-video-item"
                       onClick={() => setActiveVideo(video)}
                     >
                       <div className="mobile-video-thumbnail">
